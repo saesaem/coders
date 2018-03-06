@@ -4,8 +4,9 @@
 
 20180306 14:01
 수정한 부분
-1. depth == 4 일때, 모두 같은 숫자이면 자르지 않은 것과 마찬가지, 이므로 검사하지 않는다.
-2. solve() 함수에서 처음에 이동하지 않고 입력받은 불량 픽셀이 허용 가능 불량픽셀 이하인 경우가 있을 수 있으므로 검사를 시행한다.
+1. solve() 함수에서 처음에 이동하지 않고 입력받은 불량 픽셀이 허용 가능 불량픽셀 이하인 경우가 있을 수 있으므로 검사를 시행한다.
+2. 이동한 최소 거리를 계산할 때, 상하비교, 좌우비교해서 연산해야 함.
+
 */
 
 #include <iostream>
@@ -51,7 +52,8 @@ void pix_check() {
 		}
 	}
 	if (pix_cnt <= X) {
-		minVal = moveArr[0] + moveArr[1] + moveArr[2] + moveArr[3];
+		minVal = min(moveArr[0], moveArr[1]) * 2 + max(moveArr[0], moveArr[1]) + min(moveArr[2], moveArr[3]) + max(moveArr[2], moveArr[3]);
+		//minVal = moveArr[0] + moveArr[1] + moveArr[2] + moveArr[3];
 		ans = min(ans, minVal);
 	}
 }
@@ -68,11 +70,10 @@ void dfs(int depth, int preArr[4]) {
 
 	if (depth == 4) {
 		if (arr[0] + arr[1] < H && arr[2] + arr[3] < W) { // 상하, 좌우의 합이 SIZE 보다 작으면,
-			if(arr[0] != arr[1] || arr[2] != arr[3]){ // 모두 같은 숫자이면, 검사하지 않음.
-				copy_arr(arr, moveArr);
-				pix_check();
-				pix_cnt = 0;
-			}
+			copy_arr(arr, moveArr);
+			pix_cnt = 0;
+			pix_check();
+			pix_cnt = 0;
 		}
 		return;
 	}
@@ -95,6 +96,7 @@ void solve() {
 
 	//이동하지 않고, 처음에 검사해보기.
 	pix_check();
+	if (ans < 1000000000) return;
 	dfs(0, moveArr);
 
 }
