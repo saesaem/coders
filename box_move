@@ -1,0 +1,185 @@
+/*
+0910
+코드가 없어서 다시...
+*/
+#include <iostream>
+#include <algorithm>
+using namespace std;
+#define SIZE 11 // 11
+
+int ans = 1000000000;
+int x, y, nx, ny;
+int dx[] = { 0,0,1,-1 };
+int dy[] = { 1,-1,0,0 };
+int H, W;
+int map[SIZE][SIZE];
+int m1_x, m2_x, m1_y, m2_y;
+int flag_1, flag_2;
+int visit[10];
+
+void problemIn() {
+	cin >> H >> W;
+	for (int i = 0; i < H; i++) {
+		for (int j = 0; j < W; j++) {
+			cin >> map[i][j];
+			if (map[i][j] == -1) {
+				m1_x = i;
+				m1_y = j;
+				map[i][j] = 0;
+			}
+			else if (map[i][j] == -2) {
+				m2_x = i;
+				m2_y = j;
+				map[i][j] = 0;
+			}
+		}
+	}
+}
+
+void init() {
+	for (int i = 0; i < H; i++) {
+		for (int j = 0; j < W; j++) {
+			map[i][j] = 0;
+		}
+	}
+	ans = 1000000000;
+	for (int i = 0; i < 10; i++)
+		visit[i] = 0;
+}
+
+void copy_map(int(*a)[SIZE], int(*b)[SIZE]) {
+	for (int i = 0; i < H; i++) {
+		for (int j = 0; j < W; j++) {
+			b[i][j] = a[i][j];
+		}
+	}
+}
+
+/*
+맵 안에 들어오면
+0 을 만나는 경우
+9,2 을 만나는 경우가 있습니다.
+
+*/
+void moveArr(int dir, int depth) {
+
+	for (int i = 0; i < H; i++) {
+		for (int j = 0; j < W; j++) {
+			if (map[i][j] == 1) {
+				x = i;
+				y = j;
+				map[i][j] = 0;
+				while (1) {
+					nx = x + dx[dir];
+					ny = y + dy[dir];
+					if (nx >= 0 && ny >= 0 && nx < H && ny < W) {
+						if (map[nx][ny] == 0) {
+							x = nx;
+							y = ny;
+						}
+						else if (map[nx][ny] == 9 || map[nx][ny] == 2) {
+							break;
+						}
+					}
+					else {
+						break;
+					}
+				}
+				map[x][y] = 1;
+				if (x == m1_x && y == m1_y) flag_1 = 1;
+				break;
+			}
+		}
+	}
+
+	for (int i = 0; i < H; i++) {
+		for (int j = 0; j < W; j++) {
+			if (map[i][j] == 2) {
+				x = i;
+				y = j;
+				map[i][j] = 0;
+				while (1) {
+					nx = x + dx[dir];
+					ny = y + dy[dir];
+					if (nx >= 0 && ny >= 0 && nx < H && ny < W) {
+						if (map[nx][ny] == 0) {
+							x = nx;
+							y = ny;
+						}
+						else if (map[nx][ny] == 9 || map[nx][ny] == 1) {
+							break;
+						}
+					}
+					else {
+						break;
+					}
+				}
+				map[x][y] = 2;
+				if (x == m2_x && y == m2_y) flag_2 = 1;
+				break;
+			}
+		}
+	}
+
+	if (flag_1 && flag_2) {
+		ans = min(ans, depth + 1);
+		flag_1 = flag_2 = 0;
+	}
+	else { flag_1 = flag_2 = 0; }
+}
+
+/*
+원래 맵으로 돌아오는 것.
+dfs(0)
+하고 선언하고 for 문안에서 dfs, dfs가 끝나면 원래 맵으로 돌아오기.
+
+0 0 0 0 에 대해서 이런 것을 줄여야 하는가
+아니면 움직이는 함수를 바꿔야 하는가 궁금하네.
+
+전의 움직임과 동일하면 continue 를 걸어주어야 겠습니다.
+*/
+void dfs(int depth) {
+
+	if (depth == 9) { // depth == 9  
+		return;
+	}
+
+	int map_store[SIZE][SIZE];
+	copy_map(map, map_store);
+
+	for (int i = 0; i < 4; i++) {
+		if (depth == 0) { // 1 은 0,1,2,3 다 들어올 수 있고,
+			visit[depth] = i;
+		}
+		else { // 2부터는 이전의 방향과 동일하면 안됩니다.
+			if (i == visit[depth - 1]) continue;
+		}
+		visit[depth] = i;
+		moveArr(i, depth);
+		moveArr(i, depth);
+
+		dfs(depth + 1);
+		visit[depth] = 0;
+		copy_map(map_store, map);
+	}
+}
+
+void solve() {
+
+	dfs(0);
+
+	if (ans == 1000000000) ans = -1;
+}
+
+int main(void) {
+	int T;
+	cin >> T;
+	for (int tc = 1; tc <= T; tc++) {
+		problemIn();
+
+		solve();
+		cout << "#" << tc << " " << ans << endl;
+		init();
+	}
+	return 0;
+}
