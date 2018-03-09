@@ -78,15 +78,15 @@ void mix(int num, int mixNum) {
 		}
 	}
 
-	bool isSatisfied;
+	int isSatisfied = 0;
 
 	// 내림차순 검사
 	for (int i = N; i >= 1 ; i--) {
 		if (cardArr[N-i] == i) {
-			isSatisfied = true;
+			isSatisfied = 1;
 		}
 		else {
-			isSatisfied = false;
+			isSatisfied = 0;
 			break;
 		}
 	}
@@ -94,37 +94,37 @@ void mix(int num, int mixNum) {
 	if (isSatisfied) {
 		ans = min(ans, mixNum);
 		flag = 1;
-		return;
+//		return;
 	}
 
 
 	//올림차순 검사
-	for (int i = 1; i <= N; i++) {
-		if (cardArr[i] == i) {
-			isSatisfied = true;
+	for (int i = 0; i < N; i++) {
+		if (cardArr[i] == i+1) {
+			isSatisfied = 1;
 		}
 		else {
-			isSatisfied = false;
+			isSatisfied = 0;
 			break;
 		}
 	}
 	if (isSatisfied) {
 		ans = min(ans, mixNum);
 		flag = 1;
-		return;
+//		return;
 	}
 
 }
 
 void perm(int depth, int length) {
 
-	if (flag) return;
+//	if (flag) return;
 
 	if (depth == length) {
-		//for (int i = 0; i < length; i++) {
-		//   cout << printArr[i] << " ";
-		//}
-		//cout << endl;
+		for (int i = 0; i < length; i++) {
+		   cout << printArr[i] << " ";
+		}
+		cout << endl;
 		return;
 	}
 
@@ -135,11 +135,11 @@ void perm(int depth, int length) {
 		printArr[depth] = i;
 		if (i == 0) {
 			mix(i, depth);
-			if (flag) return;
+//			if (flag) return;
 		}
 		else{
 			mix(i, depth + 1);
-			if (flag) return;
+//			if (flag) return;
 		}
 		perm(depth + 1, length);
 		copy_arr(card_store, cardArr);
@@ -155,7 +155,7 @@ int main() {
 		problemIn();
 		for (int i = 1; i <= 5; i++) {
 			perm(0, i);
-			if (flag) break;
+//			if (flag) break;
 		}
 		if (ans == 2123456789) ans = -1;
 		cout << "#" << tc << " " << ans << endl;
